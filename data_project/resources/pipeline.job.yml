@@ -20,3 +20,14 @@ resources:
             base_parameters:
               catalog: "{{job.parameters.catalog}}"
           # A ausencia de configuracao de cluster seleciona compute serverless.
+
+        - task_key: bronze_ingestao
+          depends_on:
+            - task_key: raw_conferencia
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: ../src/bronze/ingestao.py
+            source: WORKSPACE
+            base_parameters:
+              catalog: "{{job.parameters.catalog}}"
+          # A ausencia de configuracao de cluster seleciona compute serverless.

@@ -5,7 +5,6 @@ import re
 from pyspark.sql import functions as F
 from pyspark.sql import types as T
 
-
 dbutils.widgets.text("catalog", "lakehouse", "Catalog")
 catalog = dbutils.widgets.get("catalog").strip()
 
@@ -33,7 +32,7 @@ for sistema, pasta, arquivo in ARQUIVOS_ESPERADOS:
     caminho = f"/Volumes/{catalog}/bronze/raw/{pasta}/{arquivo}"
     try:
         metadata = localizar_arquivo(caminho)
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - dbutils pode propagar erros de origens distintas.
         erros.append(f"{sistema}: nao foi possivel listar {caminho}: {exc}")
         continue
 
@@ -47,8 +46,7 @@ for sistema, pasta, arquivo in ARQUIVOS_ESPERADOS:
 
     if bytes_arquivo == 0 or linhas_dados == 0:
         erros.append(
-            f"{sistema}: arquivo vazio ou sem linhas de dados: {caminho} "
-            f"(bytes={bytes_arquivo}, linhas={linhas_dados})"
+            f"{sistema}: arquivo vazio ou sem linhas de dados: {caminho} (bytes={bytes_arquivo}, linhas={linhas_dados})"
         )
         continue
 
@@ -71,11 +69,7 @@ tabela_controle = f"`{catalog}`.`bronze`.`_raw_arquivos`"
 
 # Todas as entradas sao validadas antes deste overwrite. Assim, uma falha nao
 # substitui o ultimo snapshot valido por um resultado parcial.
-(
-    controle.write.mode("overwrite")
-    .option("overwriteSchema", "true")
-    .saveAsTable(tabela_controle)
-)
+(controle.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable(tabela_controle))
 
 spark.sql(
     f"COMMENT ON TABLE {tabela_controle} IS "
