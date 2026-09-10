@@ -1,0 +1,22 @@
+# Este job sera ampliado nas proximas entregas. DAG previsto:
+# raw_conferencia -> bronze_ingestao -> silver (tarefas paralelas) ->
+# gold/dimensoes/fatos/marts/testes -> ML/listas -> consumo e piloto.
+resources:
+  jobs:
+    concessionaria_pipeline:
+      name: concessionaria_pipeline
+      max_concurrent_runs: 1
+      schedule:
+        quartz_cron_expression: "0 0 8 * * ?"
+        timezone_id: America/Sao_Paulo
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+      tasks:
+        - task_key: raw_conferencia
+          notebook_task:
+            notebook_path: ../src/raw/conferencia.py
+            source: WORKSPACE
+            base_parameters:
+              catalog: "{{job.parameters.catalog}}"
+          # A ausencia de configuracao de cluster seleciona compute serverless.

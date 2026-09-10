@@ -1,5 +1,4 @@
-# This is a Declarative Automation Bundle definition for data_project.
-# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+# Declarative Automation Bundle for the dealership data platform.
 bundle:
   name: data_project
   uuid: ceb06508-9103-482a-8a3e-aad5dc01937c
@@ -7,26 +6,22 @@ bundle:
 include:
   - resources/*.yml
 
-# Variable declarations. These variables are assigned in the dev/prod targets below.
 variables:
   catalog:
-    description: The catalog to use
-  schema:
-    description: The schema to use
+    description: Unity Catalog catalog used by the data platform.
+    default: lakehouse
 
 targets:
   dev:
-    # The default target uses 'mode: development' to create a development copy.
-    # - Deployed resources get prefixed with '[dev my_user_name]'
-    # - Any job schedules and triggers are paused by default.
-    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
-    mode: development
     default: true
+    # Do not use mode: development here: it prefixes UC schema names and breaks
+    # the stable lakehouse.bronze/silver/gold identifiers used by downstream SQL.
+    presets:
+      trigger_pause_status: PAUSED
     workspace:
       host: https://dbc-3c3f7029-cdd9.cloud.databricks.com
     variables:
       catalog: lakehouse
-      schema: dev
   prod:
     mode: production
     workspace:
@@ -35,7 +30,6 @@ targets:
       root_path: /Workspace/Users/manussteste07@gmail.com/.bundle/${bundle.name}/${bundle.target}
     variables:
       catalog: lakehouse
-      schema: prod
     permissions:
       - user_name: manussteste07@gmail.com
         level: CAN_MANAGE

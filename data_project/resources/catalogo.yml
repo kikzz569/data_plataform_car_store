@@ -1,0 +1,24 @@
+resources:
+  schemas:
+    bronze:
+      name: bronze
+      catalog_name: ${var.catalog}
+      comment: Camada de chegada e ingestao fiel dos dados recebidos dos sistemas de origem.
+
+    silver:
+      name: silver
+      catalog_name: ${var.catalog}
+      comment: Camada de dados tipados, deduplicados, integrados e submetidos a contratos de qualidade.
+
+    gold:
+      name: gold
+      catalog_name: ${var.catalog}
+      comment: Camada de fatos, dimensoes e marts prontos para consumo analitico e comercial.
+
+  volumes:
+    raw:
+      name: raw
+      catalog_name: ${var.catalog}
+      schema_name: ${resources.schemas.bronze.name}
+      volume_type: MANAGED
+      comment: Area governada de chegada dos arquivos brutos, preservados por sistema de origem.
