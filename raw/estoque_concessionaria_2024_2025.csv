@@ -1,0 +1,197 @@
+mes_referencia,cod_produto,produto,estoque_atual,campanha_atual
+2024-01,VW-POL,Polo,17,Bônus na Troca
+2024-01,VW-SAV,Saveiro,17,IPI Reduzido
+2024-01,VW-VIR,Virtus,12,Nenhuma
+2024-01,VW-NIV,Nivus,17,Desconto na Entrada
+2024-01,VW-TCR,T-Cross,20,Desconto na Entrada
+2024-01,VW-TAO,Taos,6,Nenhuma
+2024-01,VW-TIG,Tiguan Allspace,3,Nenhuma
+2024-01,VW-AMA,Amarok,7,Nenhuma
+2024-02,VW-POL,Polo,17,Nenhuma
+2024/02,VW-SAV,Saveiro,-10,Nenhuma
+2024-02,VW-VIR,Virtus,13,Nenhuma
+2024-02,VW-NIV,Nivus,15,Nenhuma
+2024-02,VW-TCR,T-Cross,20,Taxa Zero
+2024-02,VW-TAO,Taos,5,Nenhuma
+2024-02,VW-TIG,Tiguan Allspace,3,Nenhuma
+2024-02,VW-AMA,Amarok,8,Nenhuma
+2024-03,VW-POL,Polo,20,Semana do Consumidor
+2024-03,VW-SAV,Saveiro,17,Semana do Consumidor
+2024-03,VW-VIR,Virtus,11,Semana do Consumidor
+2024-03,VW-NIV,Nivus,17,IPI Reduzido
+2024-03,VW-TCR,T-Cross,21,Semana do Consumidor
+2024/03,VW-TAO,Taos,,Nenhuma
+2024-03,VW-TIG,Tiguan Allspace,4,NENHUMA
+2024-03,VW-AMA,Amarok,8,Nenhuma
+2024-04,VW-POL,Polo,21,Nenhuma
+2024-04,VW-SAV,Saveiro,16,Desconto na Entrada
+2024-04,VW-VIR,Virtus,13,Nenhuma
+2024-04,VW-NIV,Nivus,15,Taxa Zero
+2024-04,VW-TCR,T-Cross,19,Desconto na Entrada
+2024-04,VW-TAO,Taos,5,nenhuma
+2024-04,VW-TIG,Tiguan Allspace,3,Nenhuma
+2024-04,VW-TIG,Tiguan Allspace,3,Nenhuma
+2024-04,VW-AMA,Amarok,9,Nenhuma
+2024-05,VW-POL,Polo,21,Desconto na Entrada
+2024-05,VW-SAV,Saveiro,14,Nenhuma
+2024-05,VW-VIR,Virtus,14,Nenhuma
+2024-05,VW-NIV,Nivus,14,Nenhuma
+2024-05,VW-TCR,T-Cross,18,Taxa Zero
+2024-05,VW-TAO,Taos,8,Nenhuma
+2024-05,VW-TIG,Tiguan Allspace,5,  Nenhuma 
+2024-05,VW-AMA,Amarok,7,Nenhuma
+2024/06,VW-POL,Polo,-12,Desconto na Entrada
+2024-06,VW-SAV,Saveiro,16,Nenhuma
+2024-06,VW-VIR,Virtus,13,Nenhuma
+2024-06,VW-NIV,Nivus,13,Nenhuma
+2024-06,VW-TCR,T-Cross,16,IPI Reduzido
+2024-06,VW-TAO,Taos,9,Nenhuma
+2024-06,VW-TIG,Tiguan Allspace,5,Nenhuma
+2024-06,VW-AMA,Amarok,9,Nenhuma
+2024-07,VW-POL,Polo,19,Bônus na Troca
+2024-07,VW-SAV,Saveiro,17,BÔNUS NA TROCA
+2024-07,VW-VIR,Virtus,11,Nenhuma
+2024-07,VW-NIV,Nivus,13,Nenhuma
+2024-07,VW-TCR,T-Cross,16,IPI Reduzido
+2024-07,VW-TAO,Taos,9,Nenhuma
+2024-07,VW-TIG,Tiguan Allspace,7,Nenhuma
+2024-07,VW-AMA,Amarok,8,Nenhuma
+2024-08,VW-POL,Polo,20,Nenhuma
+2024-08,VW-SAV,Saveiro,17,IPI Reduzido
+2024-08,VW-VIR,Virtus,9,Nenhuma
+2024-08,VW-NIV,Nivus,14,Taxa Zero
+2024-08,VW-TCR,T-Cross,18,Taxa Zero
+2024-08,VW-TAO,Taos,8,Nenhuma
+2024-08,VW-TIG,Tiguan Allspace,6,Nenhuma
+2024-08,VW-AMA,Amarok,8,Nenhuma
+2024-09,VW-POL,Polo,20,Nenhuma
+2024-09,VW-SAV,Saveiro,15,Nenhuma
+2024-09,VW-VIR,Virtus,9,Nenhuma
+2024-09,VW-NIV,Nivus,13,Nenhuma
+2024-09,VW-TCR,T-Cross,17,Desconto na Entrada
+2024-09,VW-TAO,Taos,7,Nenhuma
+2024-09,VW-TIG,Tiguan Allspace,5,Nenhuma
+2024-09,VW-AMA,Amarok,9,Nenhuma
+2024-10,VW-POL,Polo,21,Bônus na Troca
+2024-10,VW-SAV,Saveiro,16,Taxa Zero
+2024-10,VW-TAO,Virtus,11,Nenhuma
+2024-10,VW-NIV,Nivus,14,TAXA ZERO
+2024-10,VW-TCR,T-Cross,16,Nenhuma
+2024-10,VW-TAO,Taos,8,Nenhuma
+2024-10,VW-TIG,Tiguan Allspace,7,Nenhuma
+2024-10,VW-AMA,Amarok,8,Nenhuma
+2024-11,VW-AMA,Polo,23,Desconto na Entrada
+2024-11,VW-SAV,Saveiro,16,Taxa Zero
+2024-11,VW-VIR,Virtus,11,Nenhuma
+2024-11,VW-NIV,nivuss,14,Bônus na Troca
+2024-11,VW-TCR,T-Cross,17,Desconto na Entrada
+2024-11,VW-TAO,Taos,10,Desconto na Entrada
+2024-11,VW-TIG,Tiguan Allspace,7,Nenhuma
+2024-11,VW-AMA,Amarok,8,Nenhuma
+2024-12,VW-POL,Polo,23,Desconto na Entrada
+2024-12,VW-SAV,Saveiro,16,Desconto na Entrada
+2024-12,VW-VIR,Virtus,13,Nenhuma
+2024-12,VW-NIV,Nivus,15,Bônus na Troca
+2024-12,VW-TCR,T-Cross,18,Taxa Zero
+2024-12,VW-TAO,Taos,10,Nenhuma
+2024-12,VW-TIG,Tiguan Allspace,7,Nenhuma
+2024-12,VW-AMA,Amarok,8,Nenhuma
+2025-01,VW-POL,Polo,21,Desconto na Entrada
+2025-01,VW-SAV,Saveiro,15,Nenhuma
+2025-01,VW-VIR,Virtus,11,Nenhuma
+2025-01,VW-NIV,Nivus,,ipi reduzido
+2025-01,VW-TCR,T-Cross,19,Taxa Zero
+2025-01,VW-TAO,Taos,10,Nenhuma
+2025-01,VW-TIG,Tiguan Allspace,7,Nenhuma
+2025-01,VW-AMA,Amarok,9,Nenhuma
+2025/02,VW-POL,Polo,,Desconto na Entrada
+2025-02,VW-SAV,Saveiro,14,Nenhuma
+2025-02,VW-VIR,Virtus Sedan,10,Nenhuma
+2025-02,VW-NIV,Nivus,17,Nenhuma
+2025-02,VW-TCR,T-Cross,17,Taxa Zero
+2025-02,VW-TAO,Taos,9,Nenhuma
+2025-02,VW-TIG,Tiguan Allspace,6,Nenhuma
+2025-02,VW-TIG,Tiguan Allspace,6,Nenhuma
+2025-02,VW-AMA,Amarok,10,Nenhuma
+2025-03,VW-POL,Polo,20,Semana do Consumidor
+2025-03,VW-SAV,Saveiro,16,Semana do Consumidor
+2025-03,VW-VIR,Virtus,13,Desconto na Entrada
+2025-03,VW-NIV,Nivus,17,Semana do Consumidor
+2025-03,VW-AMA,T-Cross,20,Semana do Consumidor
+2025-03,VW-TAO,Taos,10,Nenhuma
+2025-03,VW-TIG,Tiguan Allspace,8,Nenhuma
+2025-03,VW-AMA,Amarok,9,Nenhuma
+2025-04,VW-POL,Polo,19,Taxa Zero
+2025-04,VW-SAV,Saveiro Cross,18,Bônus na Troca
+2025-04,VW-VIR,Virtus,12,Nenhuma
+2025-04,VW-NIV,Nivus,17,Taxa Zero
+2025-04,VW-TCR,T-Cross,19,Taxa Zero
+2025-04,VW-TAO,Taos,7,Nenhuma
+2025-04,VW-TIG,Tiguan Allspace,7,Nenhuma
+2025-04,VW-AMA,Amarok,9,Nenhuma
+2025-05,VW-POL,Polo,20,Taxa Zero
+2025-05,VW-SAV,Saveiro,19,Desconto na Entrada
+2025-05,VW-VIR,Virtus,13,Nenhuma
+2025-05,VW-NIV,Nivus,17,Desconto na Entrada
+2025-05,VW-TCR,T-Cross,20,Bônus na Troca
+2025-05,VW-TAO,Taos,7,Nenhuma
+2025-05,VW-TAO,Taos,7,Nenhuma
+2025-05,VW-TIG,Tiguan Allspace,7,Nenhuma
+2025-05,VW-TIG,Tiguan Allspace,7,Nenhuma
+2025-05,VW-AMA,Amarok,6,Nenhuma
+2025-06,VW-TCR,Polo,20,Taxa Zero
+2025-06,VW-SAV,Saveiro,17,Taxa Zero
+2025-06,VW-VIR,Virtus,12,Nenhuma
+2025-06,VW-NIV,Nivus,17,Nenhuma
+2025-06,VW-TCR,T-Cross,21,Bônus na Troca
+2025-06,VW-TAO,Taos,7,Nenhuma
+2025-06,VW-TIG,Tiguan Allspace,5,Nenhuma
+2025-06,VW-AMA,Amarok,8,Nenhuma
+2025-07,VW-POL,Polo,18,Bônus na Troca
+2025-07,VW-SAV,Saveiro,14,Nenhuma
+2025-07,VW-VIR,Virtus,14,Nenhuma
+2025-07,VW-NIV,Nivus,15,Nenhuma
+2025-07,VW-TCR,T-Cross,19,Taxa Zero
+2025-07,VW-TAO,Taos,10,Nenhuma
+2025-07,VW-TIG,Tiguan Allspace,6,Nenhuma
+2025-07,VW-AMA,Amarok,6,Nenhuma
+2025-08,VW-POL,Polo,18,Bônus na Troca
+2025-08,VW-SAV,Saveiro,14,Nenhuma
+2025-08,VW-VIR,Virtus,13,Nenhuma
+2025-08,VW-NIV,Nivus,13,Nenhuma
+2025-08,VW-TCR,T-Cross,20,Desconto na Entrada
+08/2025,VW-TAO,Taos,-1,Nenhuma
+2025-08,VW-TIG,Tiguan Allspace,5,Nenhuma
+2025-08,VW-AMA,Amarok,8,Nenhuma
+2025-09,VW-POL,Polo,19,Nenhuma
+2025-09,VW-SAV,Saveiro,12,Nenhuma
+2025-09,VW-VIR,Virtus,14,IPI Reduzido
+2025-09,VW-NIV,Nivus,15,Nenhuma
+2025-09,VW-TCR,T-Cross,20,Bônus na Troca
+2025-09,VW-TAO,Taos,9,Nenhuma
+2025-09,VW-TIG,Tiguan Allspace,7,Nenhuma
+2025-09,VW-AMA,Amarok,7,Nenhuma
+2025-10,VW-POL,Polo,21,Taxa Zero
+2025-10,VW-SAV,Saveiro,14,IPI Reduzido
+2025-10,VW-VIR,Virtus,12,Nenhuma
+2025-10,VW-NIV,Nivus,14,Nenhuma
+2025-10,VW-TCR,T Cross,20,Nenhuma
+2025-10,VW-TAO,Taos,7,Nenhuma
+2025-10,VW-TIG,Tiguan Allspace,7,Nenhuma
+2025-10,VW-AMA,Amarok,8,Nenhuma
+2025-11,VW-POL,Polo,21,Bônus na Troca
+2025-11,VW-SAV,Saveiro,14,Desconto na Entrada
+2025/11,VW-VIR,Virtus,,Nenhuma
+2025-11,VW-NIV,Nivus,14,Nenhuma
+2025-11,VW-TCR,T-Cross,18,Desconto na Entrada
+2025-11,VW-TAO,Taos,10,Nenhuma
+2025-11,VW-TIG,Tiguan Allspace,7,Nenhuma
+2025-11,VW-AMA,Amarok,8,Nenhuma
+2025-12,VW-POL,Polo,23,Bônus na Troca
+2025-12,VW-SAV,Saveiro,14,Desconto na Entrada
+2025-12,VW-VIR,Virtus,10,Nenhuma
+2025-12,VW-NIV,Nivus,14,IPI Reduzido
+2025-12,VW-TCR,T-Cross,18,Bônus na Troca
+2025-12,VW-TAO,Taos,9,Nenhuma
+2025-12,VW-TIG,Tiguan Allspace,5,Nenhuma
+2025-12,VW-AMA,Amarok,9,Nenhuma
