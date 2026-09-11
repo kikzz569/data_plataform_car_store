@@ -1,0 +1,989 @@
+{
+  "datasets": [
+    {
+      "name": "ds_vendas",
+      "displayName": "Vendas comerciais",
+      "queryLines": [
+        "SELECT\n",
+        "  f.id_registro,\n",
+        "  f.id_cliente_origem,\n",
+        "  COALESCE(c.nome, CONCAT('ID em quarentena: ', f.id_cliente_origem)) AS cliente,\n",
+        "  d.data AS data_entrega,\n",
+        "  d.ano,\n",
+        "  DATE_TRUNC('MONTH', d.data) AS mes_entrega,\n",
+        "  p.nome_produto AS carro,\n",
+        "  v.nome AS vendedor,\n",
+        "  f.valor_faturamento,\n",
+        "  f.margem_bruta_calculada\n",
+        "FROM fato_vendas f\n",
+        "JOIN dim_calendario d ON f.sk_data_entrega = d.sk_data\n",
+        "JOIN dim_produto p ON f.sk_produto = p.sk_produto\n",
+        "JOIN dim_vendedor v ON f.sk_vendedor = v.sk_vendedor\n",
+        "LEFT JOIN dim_cliente c ON f.sk_cliente = c.sk_cliente\n"
+      ],
+      "columns": [
+        {
+          "displayName": "Receita",
+          "description": "Soma do valor de faturamento dos registros de venda no contexto selecionado.",
+          "expression": "SUM(valor_faturamento)"
+        },
+        {
+          "displayName": "Margem bruta",
+          "description": "Soma do faturamento menos o custo informado no ERP; não desconta despesas operacionais.",
+          "expression": "SUM(margem_bruta_calculada)"
+        },
+        {
+          "displayName": "Registros de venda",
+          "description": "Quantidade de registros de venda do ERP; a origem não fornece identificador de pedido.",
+          "expression": "COUNT(id_registro)"
+        },
+        {
+          "displayName": "Ticket médio por registro",
+          "description": "Receita dividida pela quantidade de registros de venda.",
+          "expression": "SUM(valor_faturamento) / COUNT(id_registro)"
+        },
+        {
+          "displayName": "Margem %",
+          "description": "Margem bruta dividida pela receita no contexto selecionado.",
+          "expression": "SUM(margem_bruta_calculada) / NULLIF(SUM(valor_faturamento), 0)"
+        }
+      ],
+      "catalog": "lakehouse",
+      "schema": "gold"
+    },
+    {
+      "name": "ds_oportunidades",
+      "displayName": "Oportunidades comerciais",
+      "queryLines": [
+        "SELECT\n",
+        "  o.id_registro,\n",
+        "  o.id_cliente_origem,\n",
+        "  d.data AS data_interesse,\n",
+        "  d.ano,\n",
+        "  DATE_TRUNC('MONTH', d.data) AS mes_interesse,\n",
+        "  p.nome_produto AS carro,\n",
+        "  c.fonte AS canal,\n",
+        "  o.etapa,\n",
+        "  CASE o.etapa\n",
+        "    WHEN 'Primeiro Contato' THEN 1\n",
+        "    WHEN 'Agendamento' THEN 2\n",
+        "    WHEN 'Negociação' THEN 3\n",
+        "    WHEN 'Sucesso' THEN 4\n",
+        "    WHEN 'Interesse Futuro' THEN 5\n",
+        "    WHEN 'Insucesso' THEN 6\n",
+        "    ELSE 99\n",
+        "  END AS etapa_ordem\n",
+        "FROM fato_oportunidade o\n",
+        "JOIN dim_calendario d ON o.sk_data_interesse = d.sk_data\n",
+        "JOIN dim_produto p ON o.sk_produto = p.sk_produto\n",
+        "JOIN dim_canal c ON o.sk_canal = c.sk_canal\n"
+      ],
+      "columns": [
+        {
+          "displayName": "Clientes únicos",
+          "description": "Clientes distintos observados nas oportunidades; não representa conversão entre etapas.",
+          "expression": "COUNT(DISTINCT id_cliente_origem)"
+        }
+      ],
+      "catalog": "lakehouse",
+      "schema": "gold"
+    }
+  ],
+  "pages": [
+    {
+      "name": "visao_comercial",
+      "displayName": "Visão comercial",
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1",
+      "layout": [
+        {
+          "widget": {
+            "name": "titulo-dashboard",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# Dashboard Comercial\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "subtitulo-dashboard",
+            "multilineTextboxSpec": {
+              "lines": [
+                "Receita, margem, produtividade e oportunidades em uma leitura única. ",
+                "Cliques em carro cruzam as visões de vendas; use os filtros globais para aplicar carro também às oportunidades."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-receita",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_vendas",
+                  "fields": [
+                    {
+                      "name": "measure(Receita)",
+                      "expression": "MEASURE(`Receita`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(Receita)",
+                  "displayName": "Receita total",
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "BRL",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Receita total"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-margem",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_vendas",
+                  "fields": [
+                    {
+                      "name": "measure(Margem bruta)",
+                      "expression": "MEASURE(`Margem bruta`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(Margem bruta)",
+                  "displayName": "Margem bruta",
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "BRL",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Margem bruta"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-registros",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_vendas",
+                  "fields": [
+                    {
+                      "name": "measure(Registros de venda)",
+                      "expression": "MEASURE(`Registros de venda`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(Registros de venda)",
+                  "displayName": "Registros de venda",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 0
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Registros de venda"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-ticket",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_vendas",
+                  "fields": [
+                    {
+                      "name": "measure(Ticket médio por registro)",
+                      "expression": "MEASURE(`Ticket médio por registro`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(Ticket médio por registro)",
+                  "displayName": "Ticket médio por registro",
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "BRL",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Ticket médio por registro"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "secao-tendencias",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Tendências e projeção\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "receita-mensal",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_vendas",
+                  "fields": [
+                    {
+                      "name": "monthly(data_entrega)",
+                      "expression": "DATE_TRUNC(\"MONTH\", `data_entrega`)"
+                    },
+                    {
+                      "name": "measure(Receita)",
+                      "expression": "MEASURE(`Receita`)"
+                    }
+                  ],
+                  "disaggregated": false,
+                  "orders": [
+                    {
+                      "direction": "ASC",
+                      "expression": "DATE_TRUNC(\"MONTH\", `data_entrega`)"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "monthly(data_entrega)",
+                  "displayName": "Mês",
+                  "scale": {
+                    "type": "temporal"
+                  },
+                  "axis": {
+                    "hideTitle": true
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(Receita)",
+                  "displayName": "Receita",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "BRL",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Receita — 24 meses"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 7,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "margem-percentual-mensal",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_vendas",
+                  "fields": [
+                    {
+                      "name": "monthly(data_entrega)",
+                      "expression": "DATE_TRUNC(\"MONTH\", `data_entrega`)"
+                    },
+                    {
+                      "name": "measure(Margem %)",
+                      "expression": "MEASURE(`Margem %`)"
+                    }
+                  ],
+                  "disaggregated": false,
+                  "orders": [
+                    {
+                      "direction": "ASC",
+                      "expression": "DATE_TRUNC(\"MONTH\", `data_entrega`)"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "monthly(data_entrega)",
+                  "displayName": "Mês",
+                  "scale": {
+                    "type": "temporal"
+                  },
+                  "axis": {
+                    "hideTitle": true
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(Margem %)",
+                  "displayName": "Margem %",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Margem percentual"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 7,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "secao-desempenho",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Desempenho por carro e vendedor\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 13,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "carros-receita-margem",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_vendas",
+                  "fields": [
+                    {
+                      "name": "carro",
+                      "expression": "`carro`"
+                    },
+                    {
+                      "name": "valor_faturamento",
+                      "expression": "`valor_faturamento`"
+                    },
+                    {
+                      "name": "margem_bruta_calculada",
+                      "expression": "`margem_bruta_calculada`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v5.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"transform\":[{\"aggregate\":[{\"op\":\"sum\",\"field\":\"valor_faturamento\",\"as\":\"receita_total\"},{\"op\":\"sum\",\"field\":\"margem_bruta_calculada\",\"as\":\"margem_bruta\"}],\"groupby\":[\"carro\"]},{\"fold\":[\"receita_total\",\"margem_bruta\"],\"as\":[\"metrica\",\"valor\"]},{\"calculate\":\"datum.metrica === 'receita_total' ? 'Receita' : 'Margem bruta'\",\"as\":\"serie\"}],\"mark\":{\"type\":\"bar\"},\"encoding\":{\"x\":{\"field\":\"valor\",\"type\":\"quantitative\",\"title\":null,\"axis\":{\"format\":\"~s\",\"grid\":false}},\"y\":{\"field\":\"carro\",\"type\":\"nominal\",\"title\":null,\"sort\":{\"field\":\"receita_total\",\"order\":\"descending\"}},\"yOffset\":{\"field\":\"serie\",\"sort\":[\"Receita\",\"Margem bruta\"]},\"color\":{\"field\":\"serie\",\"type\":\"nominal\",\"title\":null,\"scale\":{\"domain\":[\"Receita\",\"Margem bruta\"],\"range\":[\"#D8E2EA\",\"#6E8CA8\"]},\"legend\":{\"orient\":\"top\",\"title\":null}},\"tooltip\":[{\"field\":\"carro\",\"type\":\"nominal\",\"title\":\"Carro\"},{\"field\":\"serie\",\"type\":\"nominal\",\"title\":\"Métrica\"},{\"field\":\"valor\",\"type\":\"quantitative\",\"title\":\"Valor (R$)\",\"format\":\",.2f\"}]},\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"axis\":{\"grid\":false}}}"
+              },
+              "encodings": {
+                "fields": [
+                  {"fieldName": "carro"},
+                  {"fieldName": "valor_faturamento"},
+                  {"fieldName": "margem_bruta_calculada"}
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Carros por receita e margem — até 10 linhas",
+                "showDescription": true,
+                "description": "A base atual possui oito linhas comerciais."
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 14,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "receita-margem-percentual-vendedor",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_vendas",
+                  "fields": [
+                    {
+                      "name": "vendedor",
+                      "expression": "`vendedor`"
+                    },
+                    {
+                      "name": "valor_faturamento",
+                      "expression": "`valor_faturamento`"
+                    },
+                    {
+                      "name": "margem_bruta_calculada",
+                      "expression": "`margem_bruta_calculada`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v5.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"transform\":[{\"aggregate\":[{\"op\":\"sum\",\"field\":\"valor_faturamento\",\"as\":\"receita_total\"},{\"op\":\"sum\",\"field\":\"margem_bruta_calculada\",\"as\":\"margem_bruta\"}],\"groupby\":[\"vendedor\"]},{\"calculate\":\"datum.margem_bruta / datum.receita_total\",\"as\":\"margem_percentual\"}],\"encoding\":{\"y\":{\"field\":\"vendedor\",\"type\":\"nominal\",\"title\":null,\"sort\":{\"field\":\"receita_total\",\"order\":\"descending\"}},\"tooltip\":[{\"field\":\"vendedor\",\"type\":\"nominal\",\"title\":\"Vendedor\"},{\"field\":\"receita_total\",\"type\":\"quantitative\",\"title\":\"Receita total (R$)\",\"format\":\",.2f\"},{\"field\":\"margem_percentual\",\"type\":\"quantitative\",\"title\":\"Margem %\",\"format\":\".1%\"}]},\"layer\":[{\"mark\":{\"type\":\"bar\",\"size\":30},\"encoding\":{\"x\":{\"field\":\"receita_total\",\"type\":\"quantitative\",\"title\":null,\"axis\":{\"format\":\"~s\",\"grid\":false}},\"color\":{\"datum\":\"Receita\",\"type\":\"nominal\",\"title\":null,\"scale\":{\"domain\":[\"Receita\",\"Margem bruta\"],\"range\":[\"#D8E2EA\",\"#6E8CA8\"]},\"legend\":{\"orient\":\"top\",\"title\":null}}}},{\"mark\":{\"type\":\"bar\",\"size\":16},\"encoding\":{\"x\":{\"field\":\"margem_bruta\",\"type\":\"quantitative\",\"axis\":null},\"color\":{\"datum\":\"Margem bruta\",\"type\":\"nominal\",\"title\":null,\"scale\":{\"domain\":[\"Receita\",\"Margem bruta\"],\"range\":[\"#D8E2EA\",\"#6E8CA8\"]},\"legend\":{\"orient\":\"top\",\"title\":null}}}}],\"resolve\":{\"scale\":{\"color\":\"shared\"}},\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"axis\":{\"grid\":false}}}"
+              },
+              "encodings": {
+                "fields": [
+                  {"fieldName": "vendedor"},
+                  {"fieldName": "valor_faturamento"},
+                  {"fieldName": "margem_bruta_calculada"}
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Receita total e margem percentual por vendedor"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 14,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "secao-clientes-funil",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Clientes, canais e etapas\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 20,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "clientes-canal",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_oportunidades",
+                  "fields": [
+                    {
+                      "name": "canal",
+                      "expression": "`canal`"
+                    },
+                    {
+                      "name": "measure(Clientes únicos)",
+                      "expression": "MEASURE(`Clientes únicos`)"
+                    }
+                  ],
+                  "disaggregated": false,
+                  "orders": [
+                    {
+                      "direction": "DESC",
+                      "expression": "MEASURE(`Clientes únicos`)"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "measure(Clientes únicos)",
+                  "displayName": "Clientes únicos",
+                  "scale": {
+                    "type": "quantitative",
+                    "domainMin": 0
+                  }
+                },
+                "y": {
+                  "fieldName": "canal",
+                  "displayName": "Canal de aquisição",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "value"
+                    }
+                  },
+                  "axis": {
+                    "hideTitle": true
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Clientes únicos por canal de aquisição"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 21,
+            "width": 12,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "funil-etapas",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_oportunidades",
+                  "fields": [
+                    {
+                      "name": "etapa",
+                      "expression": "`etapa`"
+                    },
+                    {
+                      "name": "min(etapa_ordem)",
+                      "expression": "MIN(`etapa_ordem`)"
+                    },
+                    {
+                      "name": "measure(Clientes únicos)",
+                      "expression": "MEASURE(`Clientes únicos`)"
+                    }
+                  ],
+                  "disaggregated": false,
+                  "orders": [
+                    {
+                      "direction": "ASC",
+                      "expression": "MIN(`etapa_ordem`)"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "funnel",
+              "encodings": {
+                "x": {
+                  "fieldName": "etapa",
+                  "displayName": "Etapa atual"
+                },
+                "y": {
+                  "fieldName": "measure(Clientes únicos)",
+                  "displayName": "Clientes únicos",
+                  "scale": {
+                    "type": "quantitative",
+                    "domainMin": 0
+                  }
+                },
+                "color": {
+                  "fieldName": "measure(Clientes únicos)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Distribuição atual de clientes por etapa",
+                "showDescription": true,
+                "description": "Fotografia dos registros disponíveis; não mede transições nem conversão entre etapas."
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 28,
+            "width": 12,
+            "height": 6
+          }
+        }
+      ]
+    },
+    {
+      "name": "filtros",
+      "displayName": "Filtros",
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS",
+      "layoutVersion": "GRID_V1",
+      "layout": [
+        {
+          "widget": {
+            "name": "filtro-ano",
+            "queries": [
+              {
+                "name": "vendas_ano",
+                "query": {
+                  "datasetName": "ds_vendas",
+                  "fields": [
+                    {
+                      "name": "ano",
+                      "expression": "`ano`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "oportunidades_ano",
+                "query": {
+                  "datasetName": "ds_oportunidades",
+                  "fields": [
+                    {
+                      "name": "ano",
+                      "expression": "`ano`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "ano",
+                    "displayName": "Ano — vendas",
+                    "queryName": "vendas_ano"
+                  },
+                  {
+                    "fieldName": "ano",
+                    "displayName": "Ano — oportunidades",
+                    "queryName": "oportunidades_ano"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Ano"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "filtro-carro",
+            "queries": [
+              {
+                "name": "vendas_carro",
+                "query": {
+                  "datasetName": "ds_vendas",
+                  "fields": [
+                    {
+                      "name": "carro",
+                      "expression": "`carro`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "oportunidades_carro",
+                "query": {
+                  "datasetName": "ds_oportunidades",
+                  "fields": [
+                    {
+                      "name": "carro",
+                      "expression": "`carro`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "carro",
+                    "displayName": "Carro — vendas",
+                    "queryName": "vendas_carro"
+                  },
+                  {
+                    "fieldName": "carro",
+                    "displayName": "Carro — oportunidades",
+                    "queryName": "oportunidades_carro"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Carro (linha comercial)"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "filtro-vendedor",
+            "queries": [
+              {
+                "name": "vendas_vendedor",
+                "query": {
+                  "datasetName": "ds_vendas",
+                  "fields": [
+                    {
+                      "name": "vendedor",
+                      "expression": "`vendedor`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "vendedor",
+                    "displayName": "Vendedor — vendas",
+                    "queryName": "vendas_vendedor"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Vendedor",
+                "showDescription": true,
+                "description": "Não afeta oportunidades: o CRM não informa vendedor."
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 0,
+            "width": 4,
+            "height": 2
+          }
+        }
+      ]
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "canvasBackgroundColor": {
+        "light": "#FFFFFF",
+        "dark": "#FFFFFF"
+      },
+      "widgetBackgroundColor": {
+        "light": "#FFFFFF",
+        "dark": "#FFFFFF"
+      },
+      "widgetBorderColor": {
+        "light": "#FFFFFF",
+        "dark": "#FFFFFF"
+      },
+      "gridLineColor": {
+        "light": "#FFFFFF",
+        "dark": "#FFFFFF"
+      },
+      "fontColor": {
+        "light": "#263442",
+        "dark": "#263442"
+      },
+      "selectionColor": {
+        "light": "#6E8CA8",
+        "dark": "#6E8CA8"
+      },
+      "visualizationColors": [
+        "#6E8CA8",
+        "#F3B8B5",
+        "#A8BDCE",
+        "#D8E2EA",
+        "#C9D8CF",
+        "#E5CDD7",
+        "#D4CBE4"
+      ],
+      "widgetHeaderAlignment": "LEFT",
+      "fontFamily": "Poppins",
+      "widgetCornerRadius": 0
+    }
+  }
+}
