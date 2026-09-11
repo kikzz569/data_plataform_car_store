@@ -10,6 +10,10 @@ variables:
   catalog:
     description: Unity Catalog catalog used by the data platform.
     default: lakehouse
+  warehouse_id:
+    description: Existing serverless SQL warehouse used by Silver SQL tasks.
+    lookup:
+      warehouse: Serverless Starter Warehouse
 
 targets:
   dev:

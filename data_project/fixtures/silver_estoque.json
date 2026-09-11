@@ -1,0 +1,46 @@
+{
+  "columns": [
+    "mes_referencia",
+    "cod_produto",
+    "produto",
+    "estoque_atual",
+    "campanha_atual"
+  ],
+  "rows": [
+    [
+      "2024-02",
+      "VW-NIV",
+      "nivuss",
+      "-12",
+      " IPI REDUZIDO "
+    ],
+    [
+      "2024-02",
+      "VW-NIV",
+      "nivuss",
+      "-12",
+      " IPI REDUZIDO "
+    ],
+    [
+      "2024/02",
+      "VW-NIV",
+      "Polo",
+      "5",
+      "Nenhuma"
+    ],
+    [
+      "02/2024",
+      "VW-NIV",
+      "Nivus",
+      null,
+      "Nenhuma"
+    ]
+  ],
+  "expected": [
+    {
+      "MES_REFERENCIA": "2024-02-01",
+      "COD_PRODUTO": "VW-NIV",
+      "PRODUTO": "Nivus"
+    }
+  ]
+}

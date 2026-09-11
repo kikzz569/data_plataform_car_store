@@ -4,8 +4,6 @@ import csv
 import json
 import os
 import pathlib
-import sys
-from contextlib import contextmanager
 
 try:
     import pytest
@@ -27,6 +25,9 @@ def spark() -> SparkSession:
             df = spark.createDataFrame([(1,)], ["x"])
             assert df.count() == 1
     """
+    _enable_fallback_compute()
+    if hasattr(DatabricksSession.builder, "validateSession"):
+        return DatabricksSession.builder.validateSession().getOrCreate()
     return DatabricksSession.builder.getOrCreate()
 
 
@@ -63,32 +64,13 @@ def _enable_fallback_compute():
         return
 
     url = "https://docs.databricks.com/dev-tools/databricks-connect/cluster-config"
-    print("☁️ no compute specified, falling back to serverless compute", file=sys.stderr)
-    print(f"  see {url} for manual configuration", file=sys.stdout)
+    print("No compute specified, falling back to serverless compute")
+    print(f"See {url} for manual configuration")
 
     os.environ["DATABRICKS_SERVERLESS_COMPUTE_ID"] = "auto"
 
 
-@contextmanager
-def _allow_stderr_output(config: pytest.Config):
-    """Temporarily disable pytest output capture."""
-    capman = config.pluginmanager.get_plugin("capturemanager")
-    if capman:
-        with capman.global_and_fixture_disabled():
-            yield
-    else:
-        yield
-
-
-def pytest_configure(config: pytest.Config):
-    """Configure pytest session."""
-    with _allow_stderr_output(config):
-        _enable_fallback_compute()
-
-        # Initialize Spark session eagerly, so it is available even when
-        # SparkSession.builder.getOrCreate() is used. For DB Connect 15+,
-        # we validate version compatibility with the remote cluster.
-        if hasattr(DatabricksSession.builder, "validateSession"):
-            DatabricksSession.builder.validateSession().getOrCreate()
-        else:
-            DatabricksSession.builder.getOrCreate()
+def pytest_addoption(parser: pytest.Parser) -> None:
+    """Keep local tests offline and opt in to SQL warehouse regression tests."""
+    parser.addoption("--sql-warehouse-tests", action="store_true", default=False)
+    parser.addoption("--databricks-profile", default=None)

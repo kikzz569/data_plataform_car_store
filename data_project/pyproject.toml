@@ -14,6 +14,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest",
+    "pyyaml",
     "ruff",
     "databricks-dlt",
     "databricks-connect>=15.4,<15.5",

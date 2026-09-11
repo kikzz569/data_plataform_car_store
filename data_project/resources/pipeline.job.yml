@@ -31,3 +31,76 @@ resources:
             base_parameters:
               catalog: "{{job.parameters.catalog}}"
           # A ausencia de configuracao de cluster seleciona compute serverless.
+
+        # As tres tarefas Silver ficam no mesmo nivel do DAG, sem dependencias entre si.
+        - task_key: silver_crm
+          depends_on:
+            - task_key: bronze_ingestao
+          run_if: ALL_SUCCESS
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ../src/silver/crm.sql
+              source: WORKSPACE
+
+        - task_key: silver_erp
+          depends_on:
+            - task_key: bronze_ingestao
+          run_if: ALL_SUCCESS
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ../src/silver/erp.sql
+              source: WORKSPACE
+
+        - task_key: silver_estoque
+          depends_on:
+            - task_key: bronze_ingestao
+          run_if: ALL_SUCCESS
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ../src/silver/estoque.sql
+              source: WORKSPACE
+
+        - task_key: gold_dimensoes
+          depends_on:
+            - task_key: silver_crm
+            - task_key: silver_erp
+            - task_key: silver_estoque
+          run_if: ALL_SUCCESS
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ../src/gold/05-dimensoes.sql
+              source: WORKSPACE
+
+        - task_key: gold_fato_vendas
+          depends_on:
+            - task_key: gold_dimensoes
+          run_if: ALL_SUCCESS
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ../src/gold/06-fato-vendas.sql
+              source: WORKSPACE
+
+        - task_key: gold_marts
+          depends_on:
+            - task_key: gold_fato_vendas
+          run_if: ALL_SUCCESS
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ../src/gold/07-marts.sql
+              source: WORKSPACE
+
+        - task_key: testes
+          depends_on:
+            - task_key: gold_marts
+          run_if: ALL_SUCCESS
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ../src/gold/08-testes.sql
+              source: WORKSPACE
